@@ -48,7 +48,7 @@ namespace DSharpDXRastertek.Tut41.System
             VerticalSyncEnabled = false;
             ScreenDepth = 100.0f;   // 1000.0f
             ScreenNear = 1.0f;      // 0.1f
-            BorderStyle = FormBorderStyle.None;
+            BorderStyle = FormBorderStyle.FixedSingle;
 
             ShaderFilePath = @"Externals\Shaders\";
             DataFilePath = @"Externals\Data\";
