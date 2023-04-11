@@ -1,11 +1,11 @@
-﻿using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.System;
 using SharpDX;
 using SharpDX.DirectInput;
 using System;
 
-namespace DSharpDXRastertek.Tut40.Input
+namespace DSharpDXRastertek.Tut41.Input
 {
-    public class DInput                 // 232 lines
+    public class DInput                 // 241 lines
     {
         // Variables.
         public KeyboardState _KeyboardState;
@@ -75,6 +75,7 @@ namespace DSharpDXRastertek.Tut40.Input
 
             return true;
         }
+        // Added this function in Turoail 13.
         public void Shutdown()
         {
             // Release the mouse.
@@ -131,7 +132,7 @@ namespace DSharpDXRastertek.Tut40.Input
                     _Keyboard.Acquire();
                 }
                 catch
-                { }
+                {  }
 
                 return true;
             }
@@ -227,6 +228,14 @@ namespace DSharpDXRastertek.Tut40.Input
         public bool IsPageDownPressed()
         {
             return _KeyboardState != null && _KeyboardState.PressedKeys.Contains(Key.PageDown);
+        }
+        public bool IsAPressed()
+        {
+            return _KeyboardState != null && _KeyboardState.PressedKeys.Contains(Key.A);
+        }
+        public bool IsZPressed()
+        {
+            return _KeyboardState != null && _KeyboardState.PressedKeys.Contains(Key.Z);
         }
     }
 }

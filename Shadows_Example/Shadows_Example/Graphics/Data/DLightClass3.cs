@@ -1,8 +1,8 @@
-﻿using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.System;
 using SharpDX;
 using System;
 
-namespace DSharpDXRastertek.Tut40.Graphics.Data
+namespace DSharpDXRastertek.Tut41.Graphics.Data
 {
     public class DLight                 // 48 lines
     {

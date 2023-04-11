@@ -1,8 +1,8 @@
 ﻿using SharpDX;
 
-namespace DSharpDXRastertek.Tut40.Graphics.Camera
+namespace DSharpDXRastertek.Tut41.Graphics.Camera
 {
-    public class DCamera                    // 63 lines
+    public class DCamera                    // 60 lines
     {
         // Properties.
         private float PositionX { get; set; }
@@ -29,10 +29,6 @@ namespace DSharpDXRastertek.Tut40.Graphics.Camera
             RotationY = y;
             RotationZ = z;
         }
-        public Vector3 GetPosition()
-        {
-            return new Vector3(PositionX, PositionY, PositionZ);
-        }
         public void Render()
         {
             // Setup the position of the camera in the world.
@@ -40,6 +36,7 @@ namespace DSharpDXRastertek.Tut40.Graphics.Camera
 
             // Setup where the camera is looking  forwardby default.
             Vector3 lookAt = new Vector3(0, 0, 1.0f);
+            Vector3 up = Vector3.UnitY;
 
             // Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
             float pitch = RotationX * 0.0174532925f;
@@ -51,7 +48,7 @@ namespace DSharpDXRastertek.Tut40.Graphics.Camera
 
             // Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
             lookAt = Vector3.TransformCoordinate(lookAt, rotationMatrix);
-            Vector3 up = Vector3.TransformCoordinate(Vector3.UnitY, rotationMatrix);
+            up = Vector3.TransformCoordinate(Vector3.UnitY, rotationMatrix);
 
             // Translate the rotated camera position to the location of the viewer.
             lookAt = position + lookAt;

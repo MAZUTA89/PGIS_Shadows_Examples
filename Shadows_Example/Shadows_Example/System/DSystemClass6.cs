@@ -1,12 +1,12 @@
-﻿using DSharpDXRastertek.Tut40.Graphics;
-using DSharpDXRastertek.Tut40.Input;
+﻿using DSharpDXRastertek.Tut41.Graphics;
+using DSharpDXRastertek.Tut41.Input;
 using SharpDX.Windows;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut40.System
+namespace DSharpDXRastertek.Tut41.System
 {
-    public class DSystem                    // 172 lines
+    public class DSystem                    // 174 lines
     {
         // Properties
         private RenderForm RenderForm { get; set; }
@@ -62,8 +62,7 @@ namespace DSharpDXRastertek.Tut40.System
             Position = new DPosition();
 
             // Set the initial position of the viewer to the same as the initial camera position.
-            SharpDX.Vector3 camPos = Graphics.Camera.GetPosition();
-            Position.SetPosition(camPos.X, camPos.Y, camPos.Z);
+            Position.SetPosition(0.0f, 2.0f, -10.0f);
 
             return result;
         }
@@ -105,7 +104,6 @@ namespace DSharpDXRastertek.Tut40.System
             if (!HandleInput(Timer.FrameTime))
                 return false;
 
-            // Get the view point position/rotation.
             // Do the frame processing for the graphics object.
             if (!Graphics.Frame(Position.PositionX, Position.PositionY, Position.PositionZ, Position.RotationX, Position.RotationY, Position.RotationZ))
                 return false;
@@ -130,6 +128,10 @@ namespace DSharpDXRastertek.Tut40.System
             Position.LookUp(keydown);
             keydown = Input.IsPageDownPressed();
             Position.LookDown(keydown);
+            keydown = Input.IsAPressed();
+            Position.MoveUpward(keydown);
+            keydown = Input.IsZPressed();
+            Position.MoveDownward(keydown);
 
             return true;
         }

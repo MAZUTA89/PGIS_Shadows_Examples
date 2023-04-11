@@ -1,10 +1,10 @@
-﻿using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.System;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 
-namespace DSharpDXRastertek.Tut40.Graphics.Data
+namespace DSharpDXRastertek.Tut41.Graphics.Data
 {
     public class DRenderTexture                 // 146 lines
     {
@@ -15,7 +15,7 @@ namespace DSharpDXRastertek.Tut40.Graphics.Data
         public Texture2D DepthStencilBuffer { get; set; }
         public DepthStencilView DepthStencilView { get; set; }
         public ViewportF ViewPort { get; set; }
-      
+
         // Puvlix Methods
         public bool Initialize(SharpDX.Direct3D11.Device device, DSystemConfiguration configuration)
         {

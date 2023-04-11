@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 
-namespace DSharpDXRastertek.Tut40.System
+namespace DSharpDXRastertek.Tut41.System
 {
     public class DTimer                 // 48 lines
     {

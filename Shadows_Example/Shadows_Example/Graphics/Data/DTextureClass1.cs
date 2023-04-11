@@ -1,7 +1,7 @@
 ﻿using SharpDX.Direct3D11;
 using SharpDX.WIC;
 
-namespace DSharpDXRastertek.Tut40.Graphics.Data
+namespace DSharpDXRastertek.Tut41.Graphics.Data
 {
     public class DTexture                   // 31 lines
     {

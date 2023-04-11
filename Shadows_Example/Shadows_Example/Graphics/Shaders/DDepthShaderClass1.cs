@@ -1,4 +1,4 @@
-﻿using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.System;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
@@ -6,11 +6,10 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut40.Graphics
+namespace DSharpDXRastertek.Tut41.Graphics
 {
-    public class DDepthShader                   // 182 lines
+    public class DDepthShader                   // 181 lines
     {
-        // Structures.
         [StructLayout(LayoutKind.Sequential)]
         internal struct DMatrixBuffer
         {

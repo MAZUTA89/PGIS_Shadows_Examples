@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using DSharpDXRastertek.Tut40;
-using DSharpDXRastertek.Tut40.System;
+using DSharpDXRastertek.Tut41;
+using DSharpDXRastertek.Tut41.System;
 
 namespace Shadows_Example
 {

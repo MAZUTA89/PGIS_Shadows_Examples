@@ -1,16 +1,15 @@
-﻿using DSharpDXRastertek.Tut40.Graphics.Camera;
-using DSharpDXRastertek.Tut40.Graphics.Data;
-using DSharpDXRastertek.Tut40.Graphics.Models;
-using DSharpDXRastertek.Tut40.Graphics.Shaders;
-using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.Graphics.Camera;
+using DSharpDXRastertek.Tut41.Graphics.Data;
+using DSharpDXRastertek.Tut41.Graphics.Models;
+using DSharpDXRastertek.Tut41.Graphics.Shaders;
+using DSharpDXRastertek.Tut41.System;
 using SharpDX;
-using SharpDX.DirectInput;
 using System;
 using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut40.Graphics
+namespace DSharpDXRastertek.Tut41.Graphics
 {
-    public class DGraphics                  // 309 lines
+    public class DGraphics                  // 390 lines
     {
         // Properties
         private DDX11 D3D { get; set; }
@@ -18,7 +17,9 @@ namespace DSharpDXRastertek.Tut40.Graphics
 
         #region Data
         private DLight Light { get; set; }
+        private DLight Light2 { get; set; }
         private DRenderTexture RenderTexture { get; set; }
+        private DRenderTexture RenderTexture2 { get; set; }
         #endregion
 
         #region Models
@@ -31,10 +32,6 @@ namespace DSharpDXRastertek.Tut40.Graphics
         public DDepthShader DepthShader { get; set; }
         public DShadowShader ShadowShader { get; set; }
         #endregion     
-
-        #region Variables
-        private float lightPositionX;
-        #endregion
 
         // Construtor
         public DGraphics() { }
@@ -58,7 +55,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
                 Camera = new DCamera();
 
                 // Set the initial position of the camera.
-                Camera.SetPosition(0.0f, 2.0f, -10.0f);
+                Camera.SetPosition(0.0f, 0.0f, -10.0f);
                 #endregion
 
                 #region Initialize Models
@@ -66,7 +63,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
                 CubeModel = new DModel();
 
                 // Initialize the cube model object.
-                if (!CubeModel.Initialize(D3D.Device, "cube.txt", "wall01sm.bmp"))
+                if (!CubeModel.Initialize(D3D.Device, "cube.txt", "wall01.bmp"))
                     return false;
 
                 // Set the position for the cube model.
@@ -96,12 +93,22 @@ namespace DSharpDXRastertek.Tut40.Graphics
                 #region Data variables.
                 // Create the light object.
                 Light = new DLight();
-
                 // Initialize the light object.
                 Light.SetAmbientColor(0.15f, 0.15f, 0.15f, 1.0f);
                 Light.SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
                 Light.SetLookAt(0.0f, 0.0f, 0.0f);
                 Light.GenerateProjectionMatrix();
+
+                // Create the second light object.
+                Light2 = new DLight();
+                // Initialize the second light object.
+                Light2.SetDiffuseColor(1.0f, 1.0f, 1.0f, 1.0f);
+                Light2.SetLookAt(0.0f, 0.0f, 0.0f);
+                Light2.GenerateProjectionMatrix();
+                
+                // Set the position of the first & second lights.
+                Light.Position = new Vector3(5.0f, 3.0f, -2.0f);
+                Light2.Position = new Vector3(-5.0f, 3.0f, -2.0f);
 
                 // Create the render to texture object.
                 RenderTexture = new DRenderTexture();
@@ -110,15 +117,22 @@ namespace DSharpDXRastertek.Tut40.Graphics
                 if (!RenderTexture.Initialize(D3D.Device, configuration))
                     return false;
 
+                // Create the second render to texture object.
+                RenderTexture2 = new DRenderTexture();
+
+                // Initialize the second render to texture object.
+                if (!RenderTexture2.Initialize(D3D.Device, configuration))
+                    return false;
+                #endregion
+
+                #region Initialize Shaders
                 // Create the depth shader object.
                 DepthShader = new DDepthShader();
 
                 // Initialize the depth shader object.
                 if (!DepthShader.Initialize(D3D.Device, windowHandle))
                     return false;
-                #endregion
 
-                #region Initialize Shaders
                 // Create the shadow shader object.
                 ShadowShader = new DShadowShader();
 
@@ -126,7 +140,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
                 if (!ShadowShader.Initialize(D3D.Device, windowHandle))
                     return false;
                 #endregion
-  
+
                 return true;
             }
             catch (Exception ex)
@@ -139,9 +153,13 @@ namespace DSharpDXRastertek.Tut40.Graphics
         {
             // Release the light object.
             Light = null;
+            Light2 = null;
             // Release the camera object.
             Camera = null;
 
+            // Release the second render to texture object.
+            RenderTexture2?.Shutdown();
+            RenderTexture2 = null;
             // Release the shadow shader object.
             ShadowShader?.ShutDown();
             ShadowShader = null;
@@ -170,14 +188,6 @@ namespace DSharpDXRastertek.Tut40.Graphics
             Camera.SetPosition(positionX, positionY, positionZ);
             Camera.SetRotation(rotationX, rotationY, rotationZ);
 
-            // Cycle the position of the light each frame and reset to -5.0f when X is grwater then 5.0f.
-            lightPositionX += 0.0001f;
-            if (lightPositionX > 5.0f)
-                lightPositionX = -5.0f;
-
-            // Update the position of the light.
-            Light.Position = new Vector3(lightPositionX, 8.0f, -5.0f);
-
             if (!Render())
                 return false;
 
@@ -189,6 +199,10 @@ namespace DSharpDXRastertek.Tut40.Graphics
             if (!RenderSceneToTexture())
                 return false;
 
+            // Render the scene to texture again but use the second light's view point.
+            if (!RenderSceneToTexture2())
+                return false;
+
             // Clear the buffers to begin the scene.
             D3D.BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -197,6 +211,9 @@ namespace DSharpDXRastertek.Tut40.Graphics
 
             // Generate the light view matrix based on the light's position.
             Light.GenerateViewMatrix();
+
+            // Do the same for the second light.
+            Light2.GenerateViewMatrix();
 
             // Get the world, view, and projection matrices from the camera and d3d objects.
             Matrix viewMatrix = Camera.ViewMatrix;
@@ -207,6 +224,10 @@ namespace DSharpDXRastertek.Tut40.Graphics
             Matrix lightViewMatrix = Light.ViewMatrix;
             Matrix lightProjectionMatrix = Light.ProjectionMatrix;
 
+            // Do the same for the second light.
+            Matrix lightViewMatrix2 = Light2.ViewMatrix;
+            Matrix lightProjectionMatrix2 = Light2.ProjectionMatrix;
+
             // Setup the translation matrix for the cube model.
             Vector3 cubePosition = CubeModel.GetPosition();
             Matrix.Translation(cubePosition.X, cubePosition.Y, cubePosition.Z, out worldMatrix);
@@ -215,7 +236,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
             CubeModel.Render(D3D.DeviceContext);
 
             // Render the model using the shadow shader.
-            if (!ShadowShader.Render(D3D.DeviceContext, CubeModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, CubeModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour))
+            if (!ShadowShader.Render(D3D.DeviceContext, CubeModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, CubeModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour, lightViewMatrix2, lightProjectionMatrix2, RenderTexture2.ShaderResourceView, Light2.Position, Light2.DiffuseColour))
                 return false;
 
             // Reset the world matrix.
@@ -227,7 +248,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
 
             // Put the model vertex and index buffers on the graphics pipeline to prepare them for drawing.
             SphereModel.Render(D3D.DeviceContext);
-            if (!ShadowShader.Render(D3D.DeviceContext, SphereModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, SphereModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour))
+            if (!ShadowShader.Render(D3D.DeviceContext, SphereModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, SphereModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour, lightViewMatrix2, lightProjectionMatrix2, RenderTexture2.ShaderResourceView, Light2.Position, Light2.DiffuseColour))
                 return false;
 
             // Reset the world matrix.
@@ -239,39 +260,13 @@ namespace DSharpDXRastertek.Tut40.Graphics
 
             // Render the ground model using the shadow shader.
             GroundModel.Render(D3D.DeviceContext);
-            if (!ShadowShader.Render(D3D.DeviceContext, GroundModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, GroundModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour))
+            if (!ShadowShader.Render(D3D.DeviceContext, GroundModel.IndexCount, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, GroundModel.Texture.TextureResource, RenderTexture.ShaderResourceView, Light.Position, Light.AmbientColor, Light.DiffuseColour, lightViewMatrix2, lightProjectionMatrix2, RenderTexture2.ShaderResourceView, Light2.Position, Light2.DiffuseColour))
                 return false;
 
             // Present the rendered scene to the screen.
             D3D.EndScene();
 
             return true;
-        }
-        void CameraMovement()
-        {
-
-            //Vector4 moveDirection = Vector4.Zero;
-            //if (Input.IsKeyPressed(Key.A)) moveDirection -= Vector4.UnitX;
-            //if (Input.IsKeyPressed(Key.D)) moveDirection += Vector4.UnitX;
-            //if (Input.IsKeyPressed(Key.W)) moveDirection += Vector4.UnitZ;
-            //if (Input.IsKeyPressed(Key.S)) moveDirection -= Vector4.UnitZ;
-
-            //moveDirection.Normalize();
-
-
-            //Matrix rotation = Matrix.RotationYawPitchRoll(Camera.RotationY, Camera.RotationX, Camera.RotationZ);
-
-            //Vector4.Transform(ref moveDirection, ref rotation, out moveDirection);
-
-            //moveDirection = moveDirection * 10 * DTimer.DeltaT;
-
-            //Camera.Move(moveDirection.X, moveDirection.Y, moveDirection.Z);
-
-            //float speed = 2f;
-            //if (Input.IsKeyPressed(Key.K)) Camera.YawBy(DTimer.DeltaT * speed);
-            //if (Input.IsKeyPressed(Key.U)) Camera.PitchBy(-DTimer.DeltaT * speed);
-            //if (Input.IsKeyPressed(Key.J)) Camera.PitchBy(DTimer.DeltaT * speed);
-            //if (Input.IsKeyPressed(Key.H)) Camera.YawBy(-DTimer.DeltaT * speed);
         }
         private bool RenderSceneToTexture()
         {
@@ -290,6 +285,65 @@ namespace DSharpDXRastertek.Tut40.Graphics
             // Get the view and orthographic matrices from the light object.
             Matrix lightViewMatrix = Light.ViewMatrix;
             Matrix lightOrthoMatrix = Light.ProjectionMatrix;
+
+            // Setup the translation matrix for the cube model.
+            Vector3 cubePosition = CubeModel.GetPosition();
+            Matrix.Translation(cubePosition.X, cubePosition.Y, cubePosition.Z, out worldMareix);
+
+            // Render the cube model with the depth shader.
+            CubeModel.Render(D3D.DeviceContext);
+            if (!DepthShader.Render(D3D.DeviceContext, CubeModel.IndexCount, worldMareix, lightViewMatrix, lightOrthoMatrix))
+                return false;
+
+            // Reset the world matrix.
+            worldMareix = D3D.WorldMatrix;
+
+            // Setup the translation matrix for the sphere model.
+            Vector3 spherePosition = SphereModel.GetPosition();
+            Matrix.Translation(spherePosition.X, spherePosition.Y, spherePosition.Z, out worldMareix);
+
+            // Render the sphere model with the depth shader.
+            SphereModel.Render(D3D.DeviceContext);
+            if (!DepthShader.Render(D3D.DeviceContext, SphereModel.IndexCount, worldMareix, lightViewMatrix, lightOrthoMatrix))
+                return false;
+
+            // Reset the world matrix.
+            worldMareix = D3D.WorldMatrix;
+
+            // Setup the translation matrix for the ground model.
+            Vector3 groundPosition = GroundModel.GetPosition();
+            Matrix.Translation(groundPosition.X, groundPosition.Y, groundPosition.Z, out worldMareix);
+
+            // Render the ground model with the depth shader.
+            GroundModel.Render(D3D.DeviceContext);
+            if (!DepthShader.Render(D3D.DeviceContext, GroundModel.IndexCount, worldMareix, lightViewMatrix, lightOrthoMatrix))
+                return false;
+
+            // Reset the render target back to the original back buffer and not the render to texture anymore.
+            D3D.SetBackBufferRenderTarget();
+
+            // Reset the viewport back to the original.
+            D3D.ResetViewPort();
+
+            return true;
+        }
+        private bool RenderSceneToTexture2()
+        {
+            // Set the render target to be the render to texture.
+            RenderTexture2.SetRenderTarget(D3D.DeviceContext);
+
+            // Clear the render to texture.
+            RenderTexture2.ClearRenderTarget(D3D.DeviceContext, 0.0f, 0.0f, 0.0f, 1.0f);
+
+            // Generate the light view matrix based on the light's position.
+            Light2.GenerateViewMatrix();
+
+            // Get the world matrix from the d3d object.
+            Matrix worldMareix = D3D.WorldMatrix;
+
+            // Get the view and orthographic matrices from the light object.
+            Matrix lightViewMatrix = Light2.ViewMatrix;
+            Matrix lightOrthoMatrix = Light2.ProjectionMatrix;
 
             // Setup the translation matrix for the cube model.
             Vector3 cubePosition = CubeModel.GetPosition();

@@ -1,11 +1,11 @@
-﻿using DSharpDXRastertek.Tut40.System;
+﻿using DSharpDXRastertek.Tut41.System;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
 
-namespace DSharpDXRastertek.Tut40.Graphics
+namespace DSharpDXRastertek.Tut41.Graphics
 {
     public class DDX11                  // 276 lines
     {
@@ -202,7 +202,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
 
                 #region Initialize matrices
                 // Setup and create the projection matrix.
-                ProjectionMatrix = Matrix.PerspectiveFovLH((float)(Math.PI / 4), ((float)configuration.Width / (float)configuration.Height), DSystemConfiguration.ScreenNear, DSystemConfiguration.ScreenDepth);
+                ProjectionMatrix = Matrix.PerspectiveFovLH((float)(Math.PI / 4), ((float)configuration.Width / configuration.Height), DSystemConfiguration.ScreenNear, DSystemConfiguration.ScreenDepth);
 
                 // Initialize the world matrix to the identity matrix.
                 WorldMatrix = Matrix.Identity;

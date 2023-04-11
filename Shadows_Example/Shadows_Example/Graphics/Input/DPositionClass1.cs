@@ -1,13 +1,13 @@
 ﻿using System;
 
-namespace DSharpDXRastertek.Tut40.Input
+namespace DSharpDXRastertek.Tut41.Input
 {
-    public class DPosition                  // 172 lines
+    public class DPosition                  // 205 lines
     {
         // Variables
         private float leftTurnSpeed, rightTurnSpeed;
         private float upLookSpeed, downLookSpeed;
-        private float forwardsMoveSpeed, reverseMoceSpeed;
+        private float forwardsMoveSpeed, reverseMoceSpeed, upwardSpeed, downwardSpeed;
 
         // Properties
         public float PositionX { get; set; }
@@ -17,7 +17,7 @@ namespace DSharpDXRastertek.Tut40.Input
         public float RotationX { get; private set; }
         public float RotationY { get; private set; }
         public float RotationZ { get; private set; }
-
+       
         // Public Methods
         public void SetPosition(float x, float y, float z)
         {
@@ -94,29 +94,28 @@ namespace DSharpDXRastertek.Tut40.Input
             if (RotationX < -90)
                 RotationX = -90;
         }
-        internal void LookUp(bool keydown)
+        public void LookUp(bool keydown)
         {
+            // If the key is pressed increase the speed at which the camera turns up. If not slow down the turn speed.
             if (keydown)
             {
-                // Update the upward rotation speed movement based on the frame time and whether the user is holding the key down or not.
-                upLookSpeed += FrameTime * 0.001f;
-
-                if (upLookSpeed > FrameTime * 0.03f)
+                upLookSpeed += FrameTime * 0.01f;
+                if (upLookSpeed > FrameTime * 0.03)
                     upLookSpeed = FrameTime * 0.03f;
             }
             else
             {
                 upLookSpeed -= FrameTime * 0.005f;
-                if (upLookSpeed < 0.0f)
-                    upLookSpeed = 0.0f;
+                if (upLookSpeed < 0)
+                    upLookSpeed = 0;
             }
 
-            // Update the rotation.
+            // Update the rotation using the turning speed.
             RotationX -= upLookSpeed;
 
             // Keep the rotation maximum 90 degrees.
-            if (RotationX > 90.0f)
-                RotationX = 90.0f;
+            if (RotationX > 90)
+                RotationX = 90;
         }
         internal void MoveForward(bool keydown)
         {
@@ -141,7 +140,6 @@ namespace DSharpDXRastertek.Tut40.Input
             // Update the position.
             PositionX += (float)Math.Sin(radians) * forwardsMoveSpeed;
             PositionZ += (float)Math.Cos(radians) * forwardsMoveSpeed;
-            PositionY -= (float)Math.Sin(radians2) * forwardsMoveSpeed;
         }
         internal void MoveBackward(bool keydown)
         {
@@ -166,7 +164,42 @@ namespace DSharpDXRastertek.Tut40.Input
             // Update the position.
             PositionX -= (float)Math.Sin(radians) * reverseMoceSpeed;
             PositionZ -= (float)Math.Cos(radians) * reverseMoceSpeed;
-            PositionY += (float)Math.Sin(radians2) * reverseMoceSpeed;
+        }
+        public void MoveUpward(bool keydown)
+        {
+            if (keydown)
+            {
+                upwardSpeed += FrameTime * 0.003f;
+                if (upwardSpeed > (FrameTime * 0.03f))
+                    upwardSpeed = FrameTime * 0.03f;
+            }
+            else
+            {
+                upwardSpeed -= FrameTime * 0.002f;
+                if (upwardSpeed < 0.0f)
+                    upwardSpeed = 0.0f;
+            }
+
+            // Update the height position.
+            PositionY += upwardSpeed;
+        }
+        public void MoveDownward(bool keydown)
+        {
+            if (keydown)
+            {
+                downwardSpeed += FrameTime * 0.003f;
+                if (downwardSpeed > (FrameTime * 0.03f))
+                    downwardSpeed = FrameTime * 0.03f;
+            }
+            else
+            {
+                downwardSpeed -= FrameTime * 0.002f;
+                if (downwardSpeed < 0.0f)
+                    downwardSpeed = 0.0f;
+            }
+
+            // Update the height position.
+            PositionY -= downwardSpeed;
         }
     }
 }
