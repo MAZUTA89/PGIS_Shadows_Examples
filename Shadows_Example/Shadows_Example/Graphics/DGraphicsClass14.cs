@@ -4,6 +4,7 @@ using DSharpDXRastertek.Tut40.Graphics.Models;
 using DSharpDXRastertek.Tut40.Graphics.Shaders;
 using DSharpDXRastertek.Tut40.System;
 using SharpDX;
+using SharpDX.DirectInput;
 using System;
 using System.Windows.Forms;
 
@@ -170,7 +171,7 @@ namespace DSharpDXRastertek.Tut40.Graphics
             Camera.SetRotation(rotationX, rotationY, rotationZ);
 
             // Cycle the position of the light each frame and reset to -5.0f when X is grwater then 5.0f.
-            lightPositionX += 0.01f;
+            lightPositionX += 0.0001f;
             if (lightPositionX > 5.0f)
                 lightPositionX = -5.0f;
 
@@ -245,6 +246,32 @@ namespace DSharpDXRastertek.Tut40.Graphics
             D3D.EndScene();
 
             return true;
+        }
+        void CameraMovement()
+        {
+
+            //Vector4 moveDirection = Vector4.Zero;
+            //if (Input.IsKeyPressed(Key.A)) moveDirection -= Vector4.UnitX;
+            //if (Input.IsKeyPressed(Key.D)) moveDirection += Vector4.UnitX;
+            //if (Input.IsKeyPressed(Key.W)) moveDirection += Vector4.UnitZ;
+            //if (Input.IsKeyPressed(Key.S)) moveDirection -= Vector4.UnitZ;
+
+            //moveDirection.Normalize();
+
+
+            //Matrix rotation = Matrix.RotationYawPitchRoll(Camera.RotationY, Camera.RotationX, Camera.RotationZ);
+
+            //Vector4.Transform(ref moveDirection, ref rotation, out moveDirection);
+
+            //moveDirection = moveDirection * 10 * DTimer.DeltaT;
+
+            //Camera.Move(moveDirection.X, moveDirection.Y, moveDirection.Z);
+
+            //float speed = 2f;
+            //if (Input.IsKeyPressed(Key.K)) Camera.YawBy(DTimer.DeltaT * speed);
+            //if (Input.IsKeyPressed(Key.U)) Camera.PitchBy(-DTimer.DeltaT * speed);
+            //if (Input.IsKeyPressed(Key.J)) Camera.PitchBy(DTimer.DeltaT * speed);
+            //if (Input.IsKeyPressed(Key.H)) Camera.YawBy(-DTimer.DeltaT * speed);
         }
         private bool RenderSceneToTexture()
         {
