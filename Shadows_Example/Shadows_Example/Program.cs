@@ -12,7 +12,7 @@ namespace Shadows_Example
     {
         static void Main(string[] args)
         {
-            DSystem.StartRenderForm("Title", 800, 600, false, false);
+            DSystem.StartRenderForm("Title", 1920, 1080, false, false);
         }
     }
 }
