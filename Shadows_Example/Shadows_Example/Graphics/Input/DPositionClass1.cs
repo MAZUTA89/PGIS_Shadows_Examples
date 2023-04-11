@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DSharpDXRastertek.Tut41.Input
+namespace DSharpDXRastertek.Tut42.Input
 {
     public class DPosition                  // 205 lines
     {
@@ -17,7 +17,7 @@ namespace DSharpDXRastertek.Tut41.Input
         public float RotationX { get; private set; }
         public float RotationY { get; private set; }
         public float RotationZ { get; private set; }
-       
+
         // Public Methods
         public void SetPosition(float x, float y, float z)
         {

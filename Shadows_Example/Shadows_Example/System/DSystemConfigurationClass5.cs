@@ -1,9 +1,10 @@
 ﻿using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut41.System
+namespace DSharpDXRastertek.Tut42.System
 {
-    public class DSystemConfiguration                   // 57 lines
+    public class DSystemConfiguration                   // 58 lines
     {
+        // Properties
         public string Title { get; set; }
         public int Width { get; set; }
         public int Height { get; set; }
@@ -41,7 +42,7 @@ namespace DSharpDXRastertek.Tut41.System
             }
         }
 
-        // Static Constructor.
+        // Static Constructor
         static DSystemConfiguration()
         {
             FullScreen = false;

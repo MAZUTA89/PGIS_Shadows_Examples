@@ -1,5 +1,5 @@
-﻿using DSharpDXRastertek.Tut41.Graphics.Data;
-using DSharpDXRastertek.Tut41.System;
+﻿using DSharpDXRastertek.Tut42.Graphics.Data;
+using DSharpDXRastertek.Tut42.System;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
@@ -11,9 +11,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Globalization;
 
-namespace DSharpDXRastertek.Tut41.Graphics.Models
+namespace DSharpDXRastertek.Tut42.Graphics.Models
 {
-    public class DModel                 // 204 lines
+    public class DModel                 // 201 lines
     {
         // Structures
         [StructLayout(LayoutKind.Sequential)]
@@ -41,10 +41,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Models
         private Vector3 Position;
 
         // Constructor 
-        public DModel() 
-        {
-            Position = Vector3.Zero;
-        }
+        public DModel() { }
 
         // Methods
         public bool Initialize(SharpDX.Direct3D11.Device device, string modelFormatFilename, string textureFileNames)

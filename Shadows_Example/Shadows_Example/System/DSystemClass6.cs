@@ -1,12 +1,12 @@
-﻿using DSharpDXRastertek.Tut41.Graphics;
-using DSharpDXRastertek.Tut41.Input;
+﻿using DSharpDXRastertek.Tut42.Graphics;
+using DSharpDXRastertek.Tut42.Input;
 using SharpDX.Windows;
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut41.System
+namespace DSharpDXRastertek.Tut42.System
 {
-    public class DSystem                    // 174 lines
+    public class DSystem                    // 175 lines
     {
         // Properties
         private RenderForm RenderForm { get; set; }
@@ -52,6 +52,7 @@ namespace DSharpDXRastertek.Tut41.System
 
             // Create and initialize Timer.
             Timer = new DTimer();
+
             if (!Timer.Initialize())
             {
                 MessageBox.Show("Could not initialize Timer object", "Error", MessageBoxButtons.OK);
@@ -60,7 +61,6 @@ namespace DSharpDXRastertek.Tut41.System
 
             // Create the position object.
             Position = new DPosition();
-
             // Set the initial position of the viewer to the same as the initial camera position.
             Position.SetPosition(0.0f, 2.0f, -10.0f);
 
@@ -104,6 +104,7 @@ namespace DSharpDXRastertek.Tut41.System
             if (!HandleInput(Timer.FrameTime))
                 return false;
 
+            // Get the view point position/rotation.
             // Do the frame processing for the graphics object.
             if (!Graphics.Frame(Position.PositionX, Position.PositionY, Position.PositionZ, Position.RotationX, Position.RotationY, Position.RotationZ))
                 return false;

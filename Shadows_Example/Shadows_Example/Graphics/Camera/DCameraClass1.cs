@@ -1,8 +1,9 @@
 ﻿using SharpDX;
+using System;
 
-namespace DSharpDXRastertek.Tut41.Graphics.Camera
+namespace DSharpDXRastertek.Tut42.Graphics.Camera
 {
-    public class DCamera                    // 60 lines
+    public class DCamera                    // 82 lines
     {
         // Properties.
         private float PositionX { get; set; }
@@ -12,6 +13,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Camera
         private float RotationY { get; set; }
         private float RotationZ { get; set; }
         public Matrix ViewMatrix { get; private set; }
+        public Matrix BaseViewMatrix { get; private set; }
 
         // Constructor
         public DCamera() { }
@@ -29,6 +31,10 @@ namespace DSharpDXRastertek.Tut41.Graphics.Camera
             RotationY = y;
             RotationZ = z;
         }
+        public Vector3 GetPosition()
+        {
+            return new Vector3(PositionX, PositionY, PositionZ);
+        }
         public void Render()
         {
             // Setup the position of the camera in the world.
@@ -36,7 +42,6 @@ namespace DSharpDXRastertek.Tut41.Graphics.Camera
 
             // Setup where the camera is looking  forwardby default.
             Vector3 lookAt = new Vector3(0, 0, 1.0f);
-            Vector3 up = Vector3.UnitY;
 
             // Set the yaw (Y axis), pitch (X axis), and roll (Z axis) rotations in radians.
             float pitch = RotationX * 0.0174532925f;
@@ -48,13 +53,30 @@ namespace DSharpDXRastertek.Tut41.Graphics.Camera
 
             // Transform the lookAt and up vector by the rotation matrix so the view is correctly rotated at the origin.
             lookAt = Vector3.TransformCoordinate(lookAt, rotationMatrix);
-            up = Vector3.TransformCoordinate(Vector3.UnitY, rotationMatrix);
+            Vector3 up = Vector3.TransformCoordinate(Vector3.UnitY, rotationMatrix);
 
             // Translate the rotated camera position to the location of the viewer.
             lookAt = position + lookAt;
 
             // Finally create the view matrix from the three updated vectors.
             ViewMatrix = Matrix.LookAtLH(position, lookAt, up);
+        }
+        internal void RenderBaseViewMatrix()
+        {
+            // Setup the vector that points upwards.
+            Vector3 up = Vector3.Up;
+
+            // Calculate the rotation in radians.
+            float radians = RotationY * 0.0174532925f;
+
+            // Setup where the camera is looking.
+            Vector3 lookAt = new Vector3();
+            lookAt.X = (float)Math.Sin(radians) + PositionX;
+            lookAt.Y = PositionY;
+            lookAt.Z = (float)Math.Cos(radians) + PositionZ;
+
+            // Create the base view matrix from the three vectors.
+            BaseViewMatrix = Matrix.LookAtLH(GetPosition(), lookAt, up);
         }
     }
 }

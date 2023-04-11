@@ -1,11 +1,11 @@
-﻿using DSharpDXRastertek.Tut41.System;
+﻿using DSharpDXRastertek.Tut42.System;
 using SharpDX;
 using SharpDX.DirectInput;
 using System;
 
-namespace DSharpDXRastertek.Tut41.Input
+namespace DSharpDXRastertek.Tut42.Input
 {
-    public class DInput                 // 241 lines
+    public class DInput                 // 240 lines
     {
         // Variables.
         public KeyboardState _KeyboardState;
@@ -75,7 +75,6 @@ namespace DSharpDXRastertek.Tut41.Input
 
             return true;
         }
-        // Added this function in Turoail 13.
         public void Shutdown()
         {
             // Release the mouse.
@@ -132,7 +131,7 @@ namespace DSharpDXRastertek.Tut41.Input
                     _Keyboard.Acquire();
                 }
                 catch
-                {  }
+                { }
 
                 return true;
             }
@@ -169,7 +168,7 @@ namespace DSharpDXRastertek.Tut41.Input
                     _Mouse.Acquire();
                 }
                 catch
-                { }
+                {  }
 
                 return true;
             }

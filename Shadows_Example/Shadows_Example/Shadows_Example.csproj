@@ -81,8 +81,13 @@
     <Compile Include="Graphics\Input\DInputClass2.cs" />
     <Compile Include="Graphics\Input\DPositionClass1.cs" />
     <Compile Include="Graphics\Models\DModelClass5..cs" />
+    <Compile Include="Graphics\Models\DOrthoWindowClass1.cs" />
     <Compile Include="Graphics\Shaders\DDepthShaderClass1.cs" />
-    <Compile Include="Graphics\Shaders\DShadowShaderClass1.cs" />
+    <Compile Include="Graphics\Shaders\DHorizontalBlurShaderClass1.cs" />
+    <Compile Include="Graphics\Shaders\DShadowShaderClass2.cs" />
+    <Compile Include="Graphics\Shaders\DSoftShadowShaderClass1.cs" />
+    <Compile Include="Graphics\Shaders\DTextureShaderClass1.cs" />
+    <Compile Include="Graphics\Shaders\DVerticalBlurShaderClass1.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\DSystemClass6.cs" />
@@ -103,10 +108,34 @@
     <None Include="Externals\Shaders\depth.vs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Externals\Shaders\horizontalblur.ps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\horizontalblur.vs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Externals\Shaders\shadow.ps">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Externals\Shaders\shadow.vs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\softshadow.ps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\softshadow.vs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\texture.ps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\texture.vs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\verticalblur.ps">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Externals\Shaders\verticalblur.vs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
@@ -390,5 +419,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

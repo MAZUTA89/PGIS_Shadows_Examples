@@ -130,3 +130,11 @@ D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\E
 D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\depth.vs
 D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\shadow.ps
 D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\shadow.vs
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\horizontalblur.ps
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\horizontalblur.vs
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\softshadow.ps
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\softshadow.vs
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\texture.ps
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\texture.vs
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\verticalblur.ps
+D:\Ivan\GitHub\PGIS_Shadows_Examples\Shadows_Example\Shadows_Example\bin\Debug\Externals\Shaders\verticalblur.vs

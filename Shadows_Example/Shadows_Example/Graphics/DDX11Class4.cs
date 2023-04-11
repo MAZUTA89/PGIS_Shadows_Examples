@@ -1,13 +1,13 @@
-﻿using DSharpDXRastertek.Tut41.System;
+﻿using DSharpDXRastertek.Tut42.System;
 using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 using System;
 
-namespace DSharpDXRastertek.Tut41.Graphics
+namespace DSharpDXRastertek.Tut42.Graphics
 {
-    public class DDX11                  // 276 lines
+    public class DDX11                  // 355 lines
     {
         // Properties.
         private bool VerticalSyncEnabled { get; set; }
@@ -18,10 +18,12 @@ namespace DSharpDXRastertek.Tut41.Graphics
         public DeviceContext DeviceContext { get; private set; }
         private RenderTargetView RenderTargetView { get; set; }
         private Texture2D DepthStencilBuffer { get; set; }
+        public DepthStencilState DepthStencilState { get; private set; }
         public DepthStencilView DepthStencilView { get; set; }
         private RasterizerState RasterState { get; set; }
         public Matrix ProjectionMatrix { get; private set; }
         public Matrix WorldMatrix { get; private set; }
+        public DepthStencilState DepthDisabledStencilState { get; private set; }
         public ViewportF ViewPort { get; set; }
 
         // Constructor
@@ -142,9 +144,41 @@ namespace DSharpDXRastertek.Tut41.Graphics
                 #endregion
 
                 #region Initialize Depth Enabled Stencil
+                // Initialize and set up the description of the stencil state.
+                var depthStencilDesc = new DepthStencilStateDescription()
+                {
+                    IsDepthEnabled = true,
+                    DepthWriteMask = DepthWriteMask.All,
+                    DepthComparison = Comparison.Less,
+                    IsStencilEnabled = true,
+                    StencilReadMask = 0xFF,
+                    StencilWriteMask = 0xFF,
+                    // Stencil operation if pixel front-facing.
+                    FrontFace = new DepthStencilOperationDescription()
+                    {
+                        FailOperation = StencilOperation.Keep,
+                        DepthFailOperation = StencilOperation.Increment,
+                        PassOperation = StencilOperation.Keep,
+                        Comparison = Comparison.Always
+                    },
+                    // Stencil operation if pixel is back-facing.
+                    BackFace = new DepthStencilOperationDescription()
+                    {
+                        FailOperation = StencilOperation.Keep,
+                        DepthFailOperation = StencilOperation.Decrement,
+                        PassOperation = StencilOperation.Keep,
+                        Comparison = Comparison.Always
+                    }
+                };
+
+                // Create the depth stencil state.
+                DepthStencilState = new DepthStencilState(Device, depthStencilDesc);
                 #endregion
 
                 #region Initialize Output Merger
+                // Set the depth stencil state.
+                DeviceContext.OutputMerger.SetDepthStencilState(DepthStencilState, 1);
+
                 // Initialize and set up the depth stencil view.
                 var depthStencilViewDesc = new DepthStencilViewDescription()
                 {
@@ -202,10 +236,44 @@ namespace DSharpDXRastertek.Tut41.Graphics
 
                 #region Initialize matrices
                 // Setup and create the projection matrix.
-                ProjectionMatrix = Matrix.PerspectiveFovLH((float)(Math.PI / 4), ((float)configuration.Width / configuration.Height), DSystemConfiguration.ScreenNear, DSystemConfiguration.ScreenDepth);
+                ProjectionMatrix = Matrix.PerspectiveFovLH((float)(Math.PI / 4), ((float)configuration.Width / (float)configuration.Height), DSystemConfiguration.ScreenNear, DSystemConfiguration.ScreenDepth);
 
                 // Initialize the world matrix to the identity matrix.
                 WorldMatrix = Matrix.Identity;
+                #endregion
+
+                #region Initialize Depth Disabled Stencil
+                // Now create a second depth stencil state which turns off the Z buffer for 2D rendering. Added in Tutorial 11
+                // The difference is that DepthEnable is set to false.
+                // All other parameters are the same as the other depth stencil state.
+                var depthDisabledStencilDesc = new DepthStencilStateDescription()
+                {
+                    IsDepthEnabled = false,
+                    DepthWriteMask = DepthWriteMask.All,
+                    DepthComparison = Comparison.Less,
+                    IsStencilEnabled = true,
+                    StencilReadMask = 0xFF,
+                    StencilWriteMask = 0xFF,
+                    // Stencil operation if pixel front-facing.
+                    FrontFace = new DepthStencilOperationDescription()
+                    {
+                        FailOperation = StencilOperation.Keep,
+                        DepthFailOperation = StencilOperation.Increment,
+                        PassOperation = StencilOperation.Keep,
+                        Comparison = Comparison.Always
+                    },
+                    // Stencil operation if pixel is back-facing.
+                    BackFace = new DepthStencilOperationDescription()
+                    {
+                        FailOperation = StencilOperation.Keep,
+                        DepthFailOperation = StencilOperation.Decrement,
+                        PassOperation = StencilOperation.Keep,
+                        Comparison = Comparison.Always
+                    }
+                };
+
+                // Create the depth stencil state.
+                DepthDisabledStencilState = new DepthStencilState(Device, depthDisabledStencilDesc);
                 #endregion
 
                 return true;
@@ -221,10 +289,14 @@ namespace DSharpDXRastertek.Tut41.Graphics
             SwapChain?.SetFullscreenState(false, null);
 
             // Dispose of all objects.
+            DepthDisabledStencilState?.Dispose();
+            DepthDisabledStencilState = null;
             RasterState?.Dispose();
             RasterState = null;
             DepthStencilView?.Dispose();
             DepthStencilView = null;
+            DepthStencilState?.Dispose();
+            DepthStencilState = null;
             DepthStencilBuffer?.Dispose();
             DepthStencilBuffer = null;
             RenderTargetView?.Dispose();
@@ -242,7 +314,6 @@ namespace DSharpDXRastertek.Tut41.Graphics
         }
         public void BeginScene(Color4 color)
         {
-
             // Clear the back buffer.
             DeviceContext.ClearRenderTargetView(RenderTargetView, color);
             // Clear the depth buffer.
@@ -261,6 +332,14 @@ namespace DSharpDXRastertek.Tut41.Graphics
                 // Present as fast as possible.
                 SwapChain.Present(0, PresentFlags.None);
             }
+        }
+        public void TurnZBufferOn()
+        {
+            DeviceContext.OutputMerger.SetDepthStencilState(DepthStencilState, 1);
+        }
+        public void TurnZBufferOff()
+        {
+            DeviceContext.OutputMerger.SetDepthStencilState(DepthDisabledStencilState, 1);
         }
         public void SetBackBufferRenderTarget()
         {

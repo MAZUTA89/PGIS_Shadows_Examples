@@ -1,12 +1,11 @@
-﻿using DSharpDXRastertek.Tut41.System;
-using SharpDX;
+﻿using SharpDX;
 using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.DXGI;
 
-namespace DSharpDXRastertek.Tut41.Graphics.Data
+namespace DSharpDXRastertek.Tut42.Graphics.Data
 {
-    public class DRenderTexture                 // 146 lines
+    public class DRenderTexture                 // 150 lines
     {
         // Properties
         private Texture2D RenderTargetTexture { get; set; }
@@ -15,9 +14,11 @@ namespace DSharpDXRastertek.Tut41.Graphics.Data
         public Texture2D DepthStencilBuffer { get; set; }
         public DepthStencilView DepthStencilView { get; set; }
         public ViewportF ViewPort { get; set; }
+        public Matrix ProjectionMatrix { get; set; }
+        public Matrix OrthoMatrix { get; set; }
 
         // Puvlix Methods
-        public bool Initialize(SharpDX.Direct3D11.Device device, DSystemConfiguration configuration)
+        public bool Initialize(SharpDX.Direct3D11.Device device, int width, int height, float depth, float near)
         {
             try
             {
@@ -25,8 +26,8 @@ namespace DSharpDXRastertek.Tut41.Graphics.Data
                 Texture2DDescription textureDesc = new Texture2DDescription()
                 {
                     // Shadow Map Texture size as a 1024x1024 Square
-                    Width = 1024, 
-                    Height = 1024,
+                    Width = width,
+                    Height = height,
                     MipLevels = 1,
                     ArraySize = 1,
                     Format = Format.R32G32B32A32_Float,
@@ -66,8 +67,8 @@ namespace DSharpDXRastertek.Tut41.Graphics.Data
                 // Initialize and Set up the description of the depth buffer.
                 Texture2DDescription depthStencilDesc = new Texture2DDescription()
                 {
-                    Width = 1024,
-                    Height = 1024,
+                    Width = width,
+                    Height = height,
                     MipLevels = 1,
                     ArraySize = 1,
                     Format = Format.D24_UNorm_S8_UInt,
@@ -95,13 +96,16 @@ namespace DSharpDXRastertek.Tut41.Graphics.Data
                 // Setup the viewport for rendering.
                 ViewPort = new ViewportF()
                 {
-                    Width = 1024.0f,
-                    Height = 1024.0f,
+                    Width = width,
+                    Height = height,
                     MinDepth = 0.0f,
                     MaxDepth = 1.0f,
                     X = 0.0f,
                     Y = 0.0f
                 };
+
+                // Create an orthographic projection matrix for 2D rendering.
+                OrthoMatrix = Matrix.OrthoLH((float)width, (float)height, near, depth);
 
                 return true;
             }

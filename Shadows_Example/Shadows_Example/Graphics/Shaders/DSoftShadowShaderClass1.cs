@@ -1,4 +1,4 @@
-﻿using DSharpDXRastertek.Tut41.System;
+﻿using DSharpDXRastertek.Tut42.System;
 using SharpDX;
 using SharpDX.D3DCompiler;
 using SharpDX.Direct3D11;
@@ -6,9 +6,9 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace DSharpDXRastertek.Tut41.Graphics.Shaders
+namespace DSharpDXRastertek.Tut42.Graphics.Shaders
 {
-    public class DShadowShader                  // 356 lines
+    public class DSoftShadowShader                  // 338 lines
     {
         // Structs
         [StructLayout(LayoutKind.Sequential)]
@@ -17,25 +17,18 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
             internal Matrix world;
             internal Matrix view;
             internal Matrix projection;
-            internal Matrix lightView;
-            internal Matrix lightProjection;
-            internal Matrix lightView2;
-            internal Matrix lightProjection2;
         }
         [StructLayout(LayoutKind.Sequential)]
         internal struct DLightBufferType
         {
             internal Vector4 ambientColor;
             internal Vector4 diffuseColor;
-            internal Vector4 diffuseColor2;
         }
         [StructLayout(LayoutKind.Sequential)]
         internal struct DLightBufferType2
         {
             internal Vector3 lightPosition;
-            internal float padding1;
-            internal Vector3 lightPosition2;
-            internal float padding2;
+            internal float padding;
         }
 
         // Properties
@@ -49,13 +42,13 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
         public SamplerState SamplerStateClamp { get; set; }
 
         // Constructor
-        public DShadowShader() { }
+        public DSoftShadowShader() { }
 
         // Methods
         public bool Initialize(Device device, IntPtr windowsHandler)
         {
             // Initialize the vertex and pixel shaders.
-            return InitializeShader(device, windowsHandler, "shadow.vs", "shadow.ps");
+            return InitializeShader(device, windowsHandler, "softshadow.vs", "softshadow.ps");
         }
         private bool InitializeShader(Device device, IntPtr windowsHandler, string vsFileName, string psFileName)
         {
@@ -66,8 +59,8 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                 psFileName = DSystemConfiguration.ShaderFilePath + psFileName;
 
                 // Compile the Vertex Shader & Pixel Shader code.
-                ShaderBytecode vertexShaderByteCode = ShaderBytecode.CompileFromFile(vsFileName, "ShadowVertexShader", DSystemConfiguration.VertexShaderProfile, ShaderFlags.None, EffectFlags.None);
-                ShaderBytecode pixelShaderByteCode = ShaderBytecode.CompileFromFile(psFileName, "ShadowPixelShader", DSystemConfiguration.PixelShaderProfile, ShaderFlags.None, EffectFlags.None);
+                ShaderBytecode vertexShaderByteCode = ShaderBytecode.CompileFromFile(vsFileName, "SoftShadowVertexShader", DSystemConfiguration.VertexShaderProfile, ShaderFlags.None, EffectFlags.None);
+                ShaderBytecode pixelShaderByteCode = ShaderBytecode.CompileFromFile(psFileName, "SoftShadowPixelShader", DSystemConfiguration.PixelShaderProfile, ShaderFlags.None, EffectFlags.None);
 
                 // Create the Vertex & Pixel Shaders from the buffer.
                 VertexShader = new VertexShader(device, vertexShaderByteCode);
@@ -83,7 +76,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                         SemanticIndex = 0,
                         Format = SharpDX.DXGI.Format.R32G32B32_Float,
                         Slot = 0,
-                        AlignedByteOffset = InputElement.AppendAligned,
+                        AlignedByteOffset = 0,
                         Classification = InputClassification.PerVertexData,
                         InstanceDataStepRate = 0
                     },
@@ -225,10 +218,10 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
             VertexShader?.Dispose();
             VertexShader = null;
         }
-        public bool Render(DeviceContext deviceContext, int indexCount, Matrix worldMatrix, Matrix viewMatrix, Matrix projectionMatrix, Matrix lightViewMatrix, Matrix lightProjectionMatrix, ShaderResourceView texture, ShaderResourceView depthMapTexture, Vector3 lightPosition, Vector4 ambientColor, Vector4 diffuseColor, Matrix lightViewMatrix2, Matrix lightProjectionMatrix2, ShaderResourceView depthMapTexture2, Vector3 lightPosition2, Vector4 diffuseColor2)
+        public bool Render(DeviceContext deviceContext, int indexCount, Matrix worldMatrix, Matrix viewMatrix, Matrix projectionMatrix, ShaderResourceView texture, ShaderResourceView shadowTexture, Vector3 lightPosition, Vector4 ambientColor, Vector4 diffuseColor)
         {
             // Set the shader parameters that it will use for rendering.
-            if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, lightViewMatrix, lightProjectionMatrix, texture, depthMapTexture, lightPosition, ambientColor, diffuseColor, lightViewMatrix2, lightProjectionMatrix2, depthMapTexture2, lightPosition2, diffuseColor2))
+            if (!SetShaderParameters(deviceContext, worldMatrix, viewMatrix, projectionMatrix, texture, shadowTexture, lightPosition, ambientColor, diffuseColor))
                 return false;
 
             // Now render the prepared buffers with the shader.
@@ -236,9 +229,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
 
             return true;
         }
-        
-        // Modified in Tutorial 10 with Specular color and Specual power as well as CameraPosition.
-        private bool SetShaderParameters(DeviceContext deviceContext, Matrix worldMatrix, Matrix viewMatrix, Matrix projectionMatrix, Matrix lightViewMatrix, Matrix lightProjectionMatrix, ShaderResourceView texture, ShaderResourceView depthMapTexture, Vector3 lightPosition, Vector4 ambientColor, Vector4 diffuseColor, Matrix lightViewMatrix2, Matrix lightProjectionMatrix2, ShaderResourceView depthMapTexture2, Vector3 lightPosition2, Vector4 diffuseColor2) 
+        private bool SetShaderParameters(DeviceContext deviceContext, Matrix worldMatrix, Matrix viewMatrix, Matrix projectionMatrix, ShaderResourceView texture, ShaderResourceView shadowTexture, Vector3 lightPosition, Vector4 ambientColor, Vector4 diffuseColor) 
         {
             try
             {
@@ -249,10 +240,6 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                 worldMatrix.Transpose();
                 viewMatrix.Transpose();
                 projectionMatrix.Transpose();
-                lightViewMatrix.Transpose();
-                lightProjectionMatrix.Transpose();
-                lightViewMatrix2.Transpose();
-                lightProjectionMatrix2.Transpose();
                 
                 // Lock the constant buffer so it can be written to.
                 deviceContext.MapSubresource(ConstantMatrixBuffer, MapMode.WriteDiscard, MapFlags.None, out mappedResource);
@@ -263,10 +250,8 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                     world = worldMatrix,
                     view = viewMatrix,
                     projection = projectionMatrix,
-                    lightView = lightViewMatrix,
-                    lightProjection = lightProjectionMatrix,
-                    lightView2 = lightViewMatrix2,
-                    lightProjection2 = lightProjectionMatrix2
+                    //lightView = lightViewMatrix,
+                    //lightProjection = lightProjectionMatrix
                 };
                 mappedResource.Write(matrixBuffer);
 
@@ -280,7 +265,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                 deviceContext.VertexShader.SetConstantBuffer(bufferPositionNumber, ConstantMatrixBuffer);
 
                 // Set shader texture resource in the pixel shader.
-                deviceContext.PixelShader.SetShaderResources(0, texture, depthMapTexture, depthMapTexture2);
+                deviceContext.PixelShader.SetShaderResources(0, texture, shadowTexture);
                 #endregion
 
                 #region Constant Light Buffer
@@ -291,8 +276,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                 var lightBuffer = new DLightBufferType()
                 {
                      ambientColor = ambientColor,
-                     diffuseColor = diffuseColor,
-                     diffuseColor2 = diffuseColor2
+                     diffuseColor = diffuseColor
                 };
                 mappedResource.Write(lightBuffer);
 
@@ -314,9 +298,7 @@ namespace DSharpDXRastertek.Tut41.Graphics.Shaders
                 DLightBufferType2 lightBuffer2 = new DLightBufferType2()
                 {
                      lightPosition = lightPosition,
-                     padding1 = 0.0f,
-                     lightPosition2 = lightPosition2,
-                     padding2 = 0.0f
+                     padding = 0.0f
                 };
                 mappedResource.Write(lightBuffer2);
 
